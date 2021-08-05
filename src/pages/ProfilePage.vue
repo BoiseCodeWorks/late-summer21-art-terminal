@@ -1,27 +1,26 @@
 <template>
-  <div class="home container">
-    <div class="row">
-      <ProjectThread :projects="projects" />
-    </div>
+  <div class="profile-page">
+    <h1>Hello Profile</h1>
+    <ProjectThread :projects="projects" />
   </div>
 </template>
 
 <script>
 import { computed, onMounted } from '@vue/runtime-core'
-import { AppState } from '../AppState'
-import Pop from '../utils/Notifier'
 import { projectsService } from '../services/ProjectsService'
+import Pop from '../utils/Notifier'
+import { useRoute } from 'vue-router'
+import { AppState } from '../AppState'
 export default {
-  name: 'Home',
   setup() {
+    const router = useRoute()
     onMounted(async() => {
       try {
-        await projectsService.getAll()
+        await projectsService.getAll({ creatorId: router.params.id })
       } catch (error) {
         Pop.toast(error, 'error')
       }
     })
-
     return {
       projects: computed(() => AppState.projects)
     }
@@ -29,13 +28,6 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-.home{
-  text-align: center;
-  user-select: none;
-  > img{
-    height: 200px;
-    width: 200px;
-  }
-}
+<style lang="scss" scoped>
+
 </style>
