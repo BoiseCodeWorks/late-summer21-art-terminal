@@ -25,7 +25,9 @@ const routes = [
     path: '/account',
     name: 'Account',
     component: loadPage('AccountPage'),
+    // NOTE prevents route from loading if user is not logged in
     beforeEnter: authGuard
+    // beforeEnter: allSettled // prevents page from loading until user is attempted to be retrieved, this does not block users not logged in
   }
 ]
 

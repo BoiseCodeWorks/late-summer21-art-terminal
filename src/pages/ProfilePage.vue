@@ -1,6 +1,5 @@
 <template>
-  <div class="profile-page">
-    <h1>Hello Profile</h1>
+  <div class="profile-page container-fluid">
     <ProjectThread :projects="projects" />
   </div>
 </template>

@@ -1,26 +1,21 @@
 <template>
   <div class="col-12">
-    <div class="row mt-2 shadow border border-light p-3" data-toggle="modal" :data-target="'#project-modal-'+project.id">
-      <div class="col-6 cover-img p-0 mb-4">
-        <img class="img-fluid" :src="project.imgUrl" alt="" srcset="">
-      </div>
-      <div class="col-6 ">
-        <div class="row justify-content-center align-items-center project-title">
-          <h4 class="border py-2 px-3 text-center">
-            {{ project.title }}
-          </h4>
+    <div class="d-flex mt-2 shadow-light bg-gray border border-light" data-toggle="modal" :data-target="'#project-modal-'+project.id">
+      <img class="cover-img" :src="project.imgUrl" alt="" srcset="">
+      <div class="d-flex flex-grow-1 justify-content-between">
+        <h4 class="py-2 px-3">
+          {{ project.title }}
+        </h4>
+        <div class="align-self-end" v-if="account.id === project.creatorId">
+          <button class="btn btn-danger" @click.stop="destroy">
+            delete
+          </button>
         </div>
-        <div class="row p-0  project-creator align-items-end pb-1">
-          <!-- NOTE @click.stop prevents the parent element from being clicked -->
-          <router-link :to="{ name: 'Profile', params: {id: project.creator.id } }" @click.stop="">
-            <div class="col-10 text-right pr-0">
-              {{ project.creator.name }}
-            </div>
-            <div class="col-2 creator-img">
-              <img class="img-fluid rounded-pill" :src="project.creator.picture" alt="" srcset="">
-            </div>
-          </router-link>
-        </div>
+        <!-- NOTE @click.stop prevents the parent element from being clicked -->
+        <router-link router-link :to="{ name: 'Profile', params: {id: project.creator.id } }" @click.stop="" class="creator p-3 align-self-end">
+          <img class="h-100 rounded-pill" :src="project.creator.picture" alt="" srcset="">
+          {{ project.creator.name }}
+        </router-link>
       </div>
     </div>
   </div>
@@ -28,6 +23,10 @@
 </template>
 
 <script>
+import { computed } from '@vue/runtime-core'
+import { AppState } from '../AppState'
+import Pop from '../utils/Notifier'
+import { projectsService } from '../services/ProjectsService'
 export default {
   props: {
     project: {
@@ -35,12 +34,35 @@ export default {
       required: true
     }
   },
-  setup() {
-    return {}
+  setup(props) {
+    return {
+      account: computed(() => AppState.account),
+      async destroy() {
+        try {
+          if (await Pop.confirm()) {
+            await projectsService.destroy(props.project.id)
+            Pop.toast('Delorted', 'success')
+          }
+        } catch (error) {
+          Pop.toast(error, 'error')
+        }
+      }
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
+.cover-img {
+  height: 200px;
+  width: 250px;
+  object-fit: cover;
+}
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+.creator{
+  height: 3em;
+}
 </style>

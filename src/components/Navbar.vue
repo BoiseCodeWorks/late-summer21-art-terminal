@@ -29,6 +29,9 @@
           </router-link>
         </li>
       </ul>
+      <div class="pr-5 action" data-toggle="modal" data-target="#create-project">
+        <span>Create Project</span>
+      </div>
       <span class="navbar-text">
         <button
           class="btn btn-outline-primary text-uppercase"
@@ -37,7 +40,6 @@
         >
           Login
         </button>
-
         <div class="dropdown" v-else>
           <div
             class="dropdown-toggle"
@@ -72,25 +74,114 @@
       </span>
     </div>
   </nav>
+  <!-- Modal -->
+  <div class="modal fade"
+       id="create-project"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="create-project"
+       aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            New Project
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="createProject">
+            <div class="form-group">
+              <label class="pr-2" for="title">Title</label>
+              <input type="text"
+                     id="title"
+                     class="form-control"
+                     required
+                     placeholder="Title..."
+                     v-model="state.newProject.title"
+              >
+            </div>
+            <div class="form-group">
+              <label class="pr-2" for="imgUrl">Cover Image</label>
+              <input type="text"
+                     id="imgUrl"
+                     class="form-control"
+                     required
+                     placeholder="Image Url..."
+                     v-model="state.newProject.imgUrl"
+              >
+            </div>
+            <div class="form-group">
+              <label class="pr-2" for="photos">Inspiration Images</label>
+              <textarea type="text"
+                        id="photos"
+                        class="form-control"
+                        placeholder="Image Urls..."
+                        v-model="state.newProject.photoString"
+              ></textarea>
+              <small class="text-muted">add many urls seperated by a line break. Current Photos:</small>
+              <small>{{ photos }}</small>
+            </div>
+            <div>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import { AuthService } from '../services/AuthService'
 import { AppState } from '../AppState'
 import { computed, reactive } from 'vue'
+import Pop from '../utils/Notifier'
+import { projectsService } from '../services/ProjectsService'
+import $ from 'jquery'
 export default {
   setup() {
     const state = reactive({
-      dropOpen: false
+      dropOpen: false,
+      newProject: {
+        photoString: ''
+      }
     })
     return {
       state,
       user: computed(() => AppState.user),
+      photos: computed(() => state.newProject.photoString.split('\n')),
       async login() {
         AuthService.loginWithPopup()
       },
       async logout() {
         AuthService.logout({ returnTo: window.location.origin })
+      },
+      async createProject() {
+        try {
+          state.newProject.photos = []
+          this.photos.forEach(p => {
+            if (p) {
+              state.newProject.photos.push({ imgUrl: p })
+            }
+          })
+          await projectsService.createProject(state.newProject)
+          state.newProject = {
+            photoString: ''
+          }
+          $('#create-project').modal('hide')
+          Pop.toast('Created!', 'success')
+        } catch (e) {
+          Pop.toast(e, 'error')
+        }
       }
     }
   }
