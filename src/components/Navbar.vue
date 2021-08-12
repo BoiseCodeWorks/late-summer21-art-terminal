@@ -177,7 +177,10 @@ export default {
           state.newProject = {
             photoString: ''
           }
+          // REVIEW close modal after create
+          // $ import from jQuery, the querystring (css selector) of the modal
           $('#create-project').modal('hide')
+          // if you want to navigate do so here AFTER closing modal
           Pop.toast('Created!', 'success')
         } catch (e) {
           Pop.toast(e, 'error')
