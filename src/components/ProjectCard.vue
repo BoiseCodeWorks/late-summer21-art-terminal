@@ -5,6 +5,7 @@
       <div class="d-flex flex-grow-1 justify-content-between">
         <h4 class="py-2 px-3">
           {{ project.title }}
+          {{ createdDate }}
         </h4>
         <div class="align-self-end" v-if="account.id === project.creatorId">
           <button class="btn btn-danger" @click.stop="destroy">
@@ -37,6 +38,12 @@ export default {
   setup(props) {
     return {
       account: computed(() => AppState.account),
+      // REVIEW Conver date to better object see 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat'
+      createdDate: computed(() => {
+        const d = new Date(props.project.createdAt)
+        return new Intl.DateTimeFormat('en-US').format(d)
+        // new TimeAgo(d)
+      }),
       async destroy() {
         try {
           if (await Pop.confirm()) {
