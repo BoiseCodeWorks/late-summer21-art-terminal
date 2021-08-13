@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { computed } from '@vue/runtime-core'
+import { computed, reactive } from '@vue/runtime-core'
 import { AppState } from '../AppState'
 import Pop from '../utils/Notifier'
 import { projectsService } from '../services/ProjectsService'
@@ -71,5 +71,6 @@ a {
 }
 .creator{
   height: 3em;
+  color: #0f0bee
 }
 </style>
